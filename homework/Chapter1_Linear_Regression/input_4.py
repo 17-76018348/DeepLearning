@@ -19,11 +19,11 @@ for line in file:
             x_label.append(line_split[i])
             x_data[line_split[i]] = []
             test_x[line_split[i]] = []
-    elif line_idx >= 1 and line_idx<380:
+    elif line_idx >= 1 and line_idx<370:
         for i in range(1,7):
             x_data[x_label[i-1]].append(float(line_split[i]))
         house_price.append(float(line_split[-1]))
-    elif line_idx>=380:
+    elif line_idx>=370:
         for i in range(1,7):
             test_x[x_label[i-1]].append(float(line_split[i]))
         test_y.append(float(line_split[-1]))
@@ -105,21 +105,21 @@ predict = theta4 * test_x[x_label[2]] + theta3 * test_x[x_label[3]]\
           +theta2 * test_x[x_label[4]] + theta1 * test_x[x_label[5]] + theta0
 test_result =  test_y - predict
 print("평균:    ",np.mean(test_result))
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (10,10))
-ax1.grid()
-ax1.plot(loss_list)
-ax1.set_title("loss", fontsize = 50)
+#fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (10,10))
+#ax1.grid()
+#ax1.plot(loss_list)
+#ax1.set_title("loss", fontsize = 50)
+#
+##fig, ax1 = plt.subplots(figsize = (10,10))
+#ax2.plot(theta4_list, label = r"$\theta_{4}$")
+#ax2.plot(theta3_list, label = r"$\theta_{3}$")
+#ax2.plot(theta2_list, label = r"$\theta_{2}$")
+#ax2.plot(theta1_list, label = r"$\theta_{1}$")
+#ax2.plot(theta0_list, label = r"$\theta_{0}$")
+#fig.legend(fontsize = 'xx-large')
+#ax2.set_title(r"$\theta_{1}, \theta_{0} Update$", fontsize = 50)
+#ax2.grid()
 
-#fig, ax1 = plt.subplots(figsize = (10,10))
-ax2.plot(theta4_list, label = r"$\theta_{4}$")
-ax2.plot(theta3_list, label = r"$\theta_{3}$")
-ax2.plot(theta2_list, label = r"$\theta_{2}$")
-ax2.plot(theta1_list, label = r"$\theta_{1}$")
-ax2.plot(theta0_list, label = r"$\theta_{0}$")
-fig.legend(fontsize = 'xx-large')
-ax2.set_title(r"$\theta_{1}, \theta_{0} Update$", fontsize = 50)
-ax2.grid()
-
-#plt.plot(test_result)
-#plt.grid()
-#plt.show()
+plt.plot(test_result)
+plt.grid()
+plt.show()
