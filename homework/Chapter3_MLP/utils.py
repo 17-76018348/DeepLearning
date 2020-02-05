@@ -30,6 +30,25 @@ def dataset_generator():
             
     return x_train_data, y_train_data, x_test_data, y_test_data
 
+def sphere_dataset():
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
+        
+    n_train_point = 5000
+    x_train_data = np.random.uniform(low = -1.5, high = 1.5, size = (n_train_point, 3))
+    y_train_data = np.zeros(shape = (n_train_point, 1))
+    
+    n_test_point = 5000
+    x_test_data = np.random.uniform(low = -1.5, high = 1.5, size = (n_test_point, 3))
+    y_test_data = np.zeros(shape = (n_test_point, 1))
+    
+    y_train_data = (np.power(x_train_data[:,1], 2) + np.power(x_train_data[:,0],2) + np.power(x_train_data[:,2],2) <= 1 + 0.1*np.random.normal(0, 1, size = (n_train_point))).astype(int)
+    y_test_data = (np.power(x_test_data[:,1], 2) + np.power(x_test_data[:,0],2) + np.power(x_test_data[:,2],2) <= 1 + 0.1*np.random.normal(0, 1, size = (n_test_point))).astype(int)
+    
+    return x_train_data, y_train_data, x_test_data, y_test_data
+
 def tester(x_train_data, y_train_data, model, trained_dict):
     if torch.cuda.is_available():
         device = torch.device('cuda')
@@ -37,7 +56,6 @@ def tester(x_train_data, y_train_data, model, trained_dict):
         device = torch.device('cpu')
         
     x_train_data, y_train_data = x_train_data.cpu().numpy(), y_train_data.cpu().numpy().reshape(-1)    
-    
     cmap = cm.get_cmap('bwr_r', 2)
     
     model.load_state_dict(trained_dict)
@@ -50,6 +68,30 @@ def tester(x_train_data, y_train_data, model, trained_dict):
     X1, X2 = np.meshgrid(test_x1, test_x2)
     
     test_X = np.dstack((X1, X2)).reshape(-1,2)
+    test_result = model(torch.tensor(test_X, dtype = torch.float, device = device))
+    test_result = test_result.view(600,500).detach().cpu().numpy()
+    ax2.pcolor(X1, X2, test_result, cmap = 'bwr_r', alpha = 0.2)
+    ax2.axis('off')
+    fig.savefig('./decision_boundary.png')
+def tester_sphere(x_train_data, y_train_data, model, trained_dict):
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
+        
+    x_train_data, y_train_data = x_train_data.cpu().numpy(), y_train_data.cpu().numpy().reshape(-1)    
+    cmap = cm.get_cmap('bwr_r', 2)
+    
+    model.load_state_dict(trained_dict)
+    
+    
+    fig, ax2 = plt.subplots(figsize = (15,15))
+    ax2.scatter(x_train_data[:,0], x_train_data[:,1], marker = 'o', color = cmap(y_train_data), alpha = 0.4)
+    test_x1 = np.linspace(-2, 2, 500)
+    test_x2 = np.linspace(-2, 2, 600)
+    X1, X2 = np.meshgrid(test_x1, test_x2)
+    
+    test_X = np.dstack((X1, X2)).reshape(-1,3)
     test_result = model(torch.tensor(test_X, dtype = torch.float, device = device))
     test_result = test_result.view(600,500).detach().cpu().numpy()
     ax2.pcolor(X1, X2, test_result, cmap = 'bwr_r', alpha = 0.2)

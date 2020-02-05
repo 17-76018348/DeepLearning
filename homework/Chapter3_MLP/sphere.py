@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from utils import dataset_generator, tester, sphere_dataset
+from utils import dataset_generator, tester, sphere_dataset, tester_sphere
 
 np.random.seed(0)
 torch.manual_seed(0)
@@ -45,16 +45,16 @@ class MLP_Classifier(nn.Module):
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
     def forward(self,x):
-        x = self.tanh(self.fc1(x))
+        x = self.sigmoid(self.fc1(x))
         x = self.sigmoid(self.fc2(x))
         return x
 print("0")
-fc1_input_size = 2
+fc1_input_size = 3
 lr = 0.07
 fc2_output_size = 1
-epochs = 50000
+epochs = 10000
 loss_list = []
-n_neuron_list = [15]
+n_neuron_list = [30]
 
 print("1")
 for n_idx in range(len(n_neuron_list)):
@@ -76,5 +76,5 @@ print("3")
    
 trained_dict = model.state_dict()
 model = MLP_Classifier(fc1_input_size,n_neuron,fc2_output_size).to(device)
-tester(x_test_data, y_test_data, model, trained_dict)
+tester_sphere(x_test_data, y_test_data, model, trained_dict)
 print("4")
