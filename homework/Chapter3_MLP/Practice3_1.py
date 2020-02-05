@@ -30,32 +30,37 @@ x_train_data, y_train_data, x_test_data, y_test_data = dataset_generator()
 #                     wspace = 0.05)
 # ax1.scatter(x_train_data[:,0], x_train_data[:,1], marker = 'o', color = cmap(y_train_data), alpha = 0.4)
 # ax2.scatter(x_test_data[:,0], x_test_data[:,1], marker = 'o', color = cmap(y_test_data), alpha = 0.4)
+
 x_train_data = torch.tensor(x_train_data,dtype = torch.float)
 y_train_data = torch.tensor(y_train_data,dtype = torch.float)
 x_test_data = torch.tensor(x_test_data,dtype = torch.float)
 y_test_data = torch.tensor(y_test_data,dtype = torch.float)
 class MLP_Classifier(nn.Module):
-    def __init__(self,fc1_input_size,n_neuron,fc2_output_size):
+    def __init__(self,input_size,n_neuron,n_neuron_2,output_size):
         super(MLP_Classifier,self).__init__()
-        self.fc1_input_size, self.n_neuron,self.fc2_output_size = fc1_input_size, n_neuron, fc2_output_size
-        self.fc1 = nn.Linear(self.fc1_input_size,self.n_neuron)
-        self.fc2 = nn.Linear(self.n_neuron,self.fc2_output_size)
+        self.input_size, self.n_neuron,self.n_neuron_2,self.output_size = input_size, n_neuron, n_neuron_2,output_size
+        self.fc1 = nn.Linear(self.input_size,self.n_neuron)
+        self.fc2 = nn.Linear(self.n_neuron,self.n_neuron_2)
+        self.fc3 = nn.Linear(self.n_neuron_2,self.output_size)
         self.sigmoid = nn.Sigmoid()
+        self.tanh = nn.Tanh()
     def forward(self,x):
-        x = self.sigmoid(self.fc1(x))
-        x = self.sigmoid(self.fc2(x))
+        x = self.tanh(self.fc1(x))
+        x = self.tanh(self.fc2(x))
+        x = self.sigmoid(self.fc3(x))
         return x
 print("0")
 fc1_input_size = 2
-lr = 0.001
+lr = 0.07
 fc2_output_size = 1
-epochs = 3
+epochs = 20000
 loss_list = []
-n_neuron_list = [10,20,30]
+n_neuron_list = [10]
+n_neuron_2 = 3
 print("1")
 for n_idx in range(len(n_neuron_list)):
     n_neuron = n_neuron_list[n_idx]
-    model = MLP_Classifier(fc1_input_size,n_neuron,fc2_output_size)
+    model = MLP_Classifier(fc1_input_size,n_neuron,n_neuron_2,fc2_output_size)
     criterion = nn.BCELoss()
     optimizer = optim.SGD(model.parameters(),lr = lr)
     for i in range(epochs):
@@ -66,10 +71,11 @@ for n_idx in range(len(n_neuron_list)):
         optimizer.step()
         loss_list.append(loss.detach().numpy())
 
+fig, ax = plt.subplots(figsize = (20,20))
+ax.plot(loss_list)
 print("3")
-model = MLP_Classifier(fc1_input_size,n_neuron,fc2_output_size).to(device)
    
 trained_dict = model.state_dict()
-model = MLP_Classifier(fc1_input_size,n_neuron,fc2_output_size).to(device)
-tester(x_train_data, y_train_data, model, trained_dict)
+model = MLP_Classifier(fc1_input_size,n_neuron,n_neuron_2,fc2_output_size).to(device)
+tester(x_test_data, y_test_data, model, trained_dict)
 print("4")
