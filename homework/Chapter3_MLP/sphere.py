@@ -85,27 +85,17 @@ model.eval()
 
 
 pred_test = model(x_test_data)
+
+
 print(pred_test)
-# print(pred_test)
-# print(y_test_data)
+print(y_test_data)
 
 topv, topi = pred_test.topk(1,dim = 1)
 print(topi)
 topi = topi.view(-1)
 print(topi)
-# print(topi.shape)
+print(topi.shape)
 n_correct = (topi == y_test_data).to(float).sum()
-# print(n_correct)
-# print(n_correct/y_test_data.shape[0])
+print(n_correct)
+print(n_correct/y_test_data.shape[0])
 
-
-# pred_test = model(x_test_data)
-# print(pred_test)
-# topv, topi = pred_test.topk(1,dim = 1)
-# topi = topi.view(-1)
-# print(topi)
-# y_test_data = y_test_data.view(-1)
-# n_correct = (topi == y_test_data).to(float).sum()
-
-# print(n_correct)
-# print(n_correct / y_test_data.shape[0])
