@@ -49,32 +49,31 @@ class MLP_Classifier(nn.Module):
         x = self.sigmoid(self.fc2(x))
         return x
 print("0")
-fc1_input_size = 2
+input_size = 2
 lr = 0.07
-fc2_output_size = 1
+output_size = 1
 epochs = 50000
 loss_list = []
-n_neuron_list = [15]
+n_neuron = 15
 
 print("1")
-for n_idx in range(len(n_neuron_list)):
-    n_neuron = n_neuron_list[n_idx]
-    model = MLP_Classifier(fc1_input_size,n_neuron,fc2_output_size)
-    criterion = nn.BCELoss()
-    optimizer = optim.SGD(model.parameters(),lr = lr)
-    for i in range(epochs):
-        pred= model(x_train_data)
-        optimizer.zero_grad()
-        loss = criterion(pred,y_train_data)
-        loss.backward()
-        optimizer.step()
-        loss_list.append(loss.detach().numpy())
+
+model = MLP_Classifier(input_size,n_neuron,output_size)
+criterion = nn.BCELoss()
+optimizer = optim.SGD(model.parameters(),lr = lr)
+for i in range(epochs):
+    pred= model(x_train_data)
+    optimizer.zero_grad()
+    loss = criterion(pred,y_train_data)
+    loss.backward()
+    optimizer.step()
+    loss_list.append(loss.detach().numpy())
 
 fig, ax = plt.subplots(figsize = (20,20))
 ax.plot(loss_list)
 print("3")
    
 trained_dict = model.state_dict()
-model = MLP_Classifier(fc1_input_size,n_neuron,fc2_output_size).to(device)
+model = MLP_Classifier(input_size,n_neuron,output_size).to(device)
 tester(x_test_data, y_test_data, model, trained_dict)
 print("4")

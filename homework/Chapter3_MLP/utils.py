@@ -96,4 +96,4 @@ def tester_sphere(x_train_data, y_train_data, model, trained_dict):
     test_result = test_result.view(600,500).detach().cpu().numpy()
     ax2.pcolor(X1, X2, test_result, cmap = 'bwr_r', alpha = 0.2)
     ax2.axis('off')
-    fig.savefig('./decision_boundary.png')
+    fig.savefig('.decision_boundary.png')
