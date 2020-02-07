@@ -51,9 +51,9 @@ class MLP_Classifier(nn.Module):
 
 
 input_size = 3
-lr = 0.07
+lr = 0.2
 output_size = 2
-epochs = 100
+epochs = 1000
 loss_list = []
 n_neuron = 30
 
@@ -89,12 +89,14 @@ pred_test = model(x_test_data)
 
 print(pred_test)
 print(y_test_data)
-
+print(y_test_data.sum())
+print("\n\n\n")
 topv, topi = pred_test.topk(1,dim = 1)
+print(topv)
 print(topi)
+print(topi.sum())
 topi = topi.view(-1)
-print(topi)
-print(topi.shape)
+
 n_correct = (topi == y_test_data).to(float).sum()
 print(n_correct)
 print(n_correct/y_test_data.shape[0])
