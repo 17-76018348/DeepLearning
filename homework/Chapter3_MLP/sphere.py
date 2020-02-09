@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from mpl_toolkits.mplot3d import Axes3D
 import datetime
 
 import torch
@@ -26,6 +27,10 @@ y_train_data = torch.tensor(y_train_data,dtype = torch.long).view(-1)
 x_test_data = torch.tensor(x_test_data,dtype = torch.float).view(-1,3)
 y_test_data = torch.tensor(y_test_data,dtype = torch.long).view(-1)
 
+fig = plt.figure(figsize = (15,15))
+ax= fig.gca(projection = '3d')
+
+ax.plot()
 
 
 
@@ -39,7 +44,7 @@ class MLP_Classifier(nn.Module):
         self.input_size, self.n_neuron,self.output_size = input_size, n_neuron,output_size
         self.fc1 = nn.Linear(self.input_size,self.n_neuron)
         self.fc2 = nn.Linear(self.n_neuron,self.output_size)
-        self.logsoftmax = nn.LogSoftmax()
+        self.logsoftmax = nn.LogSoftmax(dim = 1)
         self.sigmoid = nn.Sigmoid()
         self.nll = nn.NLLLoss()
         self.tanh = nn.Tanh()
@@ -73,24 +78,28 @@ for i in range(epochs):
     optimizer.step()
     loss_list.append(loss.detach().numpy())
 
+
 fig, ax = plt.subplots(figsize = (20,20))
 ax.plot(loss_list)
 
-   
+#%%
+
 trained_dict = model.state_dict()
 
 model = MLP_Classifier(input_size,n_neuron,output_size)
+model.load_state_dict(trained_dict)
 model.eval()
-
-
-
 pred_test = model(x_test_data)
 
 
 print(pred_test)
 print(y_test_data)
-print(y_test_data.sum())
+
+
+
 print("\n\n\n")
+
+
 topv, topi = pred_test.topk(1,dim = 1)
 print(topv)
 print(topi)
