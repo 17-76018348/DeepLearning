@@ -13,7 +13,7 @@ from utils import dataset_generator, tester, sphere_dataset
 np.random.seed(0)
 torch.manual_seed(0)
 
-if torch.cuda.is_available():
+if torch.cuda.is_available(): 
     device = torch.device('cuda')
 else:
     device = torch.device('cpu')
