@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -74,74 +75,74 @@ for epoch in trange(epochs):
         optimizer.step()
 
 #%%
-print(model.state_dict().keys())
-trained_dict = model.state_dict()
-from collections import OrderedDict
+# print(model.state_dict().keys())
+# trained_dict = model.state_dict()
+# from collections import OrderedDict
 
-enc_state_dict = OrderedDict()
-dec_state_dict = OrderedDict()
+# enc_state_dict = OrderedDict()
+# dec_state_dict = OrderedDict()
 
-for k, v in trained_dict.items():
-    if k.startswith('encoder'):
-        enc_state_dict[k] = v
+# for k, v in trained_dict.items():
+#     if k.startswith('encoder'):
+#         enc_state_dict[k] = v
 
-for k, v in trained_dict.items():
-    if k.startswith('decoder'):
-        dec_state_dict[k] = v
+# for k, v in trained_dict.items():
+#     if k.startswith('decoder'):
+#         dec_state_dict[k] = v
 
 #%%
-class MNIST_encoder(nn.Module):
-    def __init__(self):
-        super(MNIST_encoder, self).__init__()
-        self.encoder = nn.Sequential(
-            nn.Linear(28*28, 512),
-            nn.ReLU(True),
-            nn.Linear(512, 256),
-            nn.ReLU()
-            )
+# class MNIST_encoder(nn.Module):
+#     def __init__(self):
+#         super(MNIST_encoder, self).__init__()
+#         self.encoder = nn.Sequential(
+#             nn.Linear(28*28, 512),
+#             nn.ReLU(True),
+#             nn.Linear(512, 256),
+#             nn.ReLU()
+#             )
     
-    def forward(self, x):
-        return self.encoder(x)
+#     def forward(self, x):
+#         return self.encoder(x)
     
-class MNIST_generator(nn.Module):
-    def __init__(self):
-        super(MNIST_generator, self).__init__()
-        self.decoder = nn.Sequential(
-            nn.Linear(256, 512),
-            nn.ReLU(True),
-            nn.Linear(512, 28*28),
-            nn.Sigmoid()
-            )
+# class MNIST_generator(nn.Module):
+#     def __init__(self):
+#         super(MNIST_generator, self).__init__()
+#         self.decoder = nn.Sequential(
+#             nn.Linear(256, 512),
+#             nn.ReLU(True),
+#             nn.Linear(512, 28*28),
+#             nn.Sigmoid()
+#             )
     
-    def forward(self, x):
-        return self.decoder(x)
+#     def forward(self, x):
+#         return self.decoder(x)
     
-encoder = MNIST_encoder()
-encoder.load_state_dict(enc_state_dict)
+# encoder = MNIST_encoder()
+# encoder.load_state_dict(enc_state_dict)
 
-generator = MNIST_generator()
-generator.load_state_dict(dec_state_dict)        
+# generator = MNIST_generator()
+# generator.load_state_dict(dec_state_dict)        
         
-for step, (img, label) in enumerate(validation_loader):
-    img = img.view(-1, 28*28)
+# for step, (img, label) in enumerate(validation_loader):
+#     img = img.view(-1, 28*28)
     
-    encoded_arr = encoder(img)
-    m_img = generator(encoded_arr)
+#     encoded_arr = encoder(img)
+#     m_img = generator(encoded_arr)
     
     
-    t_img = m_img[0].view(28,28).detach().cpu().numpy()
-    fig, ax = plt.subplots(figsize = (30,30))
-    ax.imshow(t_img, 'gray')
-    print(encoded_arr.shape)
+#     t_img = m_img[0].view(28,28).detach().cpu().numpy()
+#     fig, ax = plt.subplots(figsize = (30,30))
+#     ax.imshow(t_img, 'gray')
+#     print(encoded_arr.shape)
     
-    break        
+#     break        
 #%%
-random_num = torch.tensor(np.random.uniform(0, 2, size = (1,256)), dtype = torch.float)
-m_img = generator(random_num)
+# random_num = torch.tensor(np.random.uniform(0, 2, size = (1,256)), dtype = torch.float)
+# m_img = generator(random_num)
     
-t_img = m_img[0].view(28,28).detach().cpu().numpy()
-fig, ax = plt.subplots(figsize = (30,30))
-ax.imshow(t_img, 'gray')
+# t_img = m_img[0].view(28,28).detach().cpu().numpy()
+# fig, ax = plt.subplots(figsize = (30,30))
+# ax.imshow(t_img, 'gray')
     
     
     
