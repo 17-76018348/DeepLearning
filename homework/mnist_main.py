@@ -48,6 +48,7 @@ trian_batch_size, val_batch_size = 10, 2000
 lr = 0.001
 cnt = 0
 loss_list = []
+val_acc_list = []
 train_loader, validation_loader = get_dataloader(trian_batch_size,val_batch_size)
 
 model = MNIST().to(device)
@@ -55,8 +56,10 @@ criterion = nn.NLLLoss()
 optimizer = optim.Adam(model.parameters(),lr = lr)
 
 
-model.train()
+
 for epoch in trange(epochs):
+    model.train()
+    loss_epoch = 0
     for step, (img, label) in enumerate(train_loader):
         img, label = img.view(-1,28*28).to(device), label.to(device)
         pred = model(img)
@@ -64,9 +67,25 @@ for epoch in trange(epochs):
         loss = criterion(pred,label)
         loss.backward()
         optimizer.step()
+    loss_epoch += loss.item() * pred.shape[0]
     loss_list.append(loss)
+    
+    model.eval()
+    val_acc = 0
+    
+    for step, (img, label) in enumerate(validation_loader):
+        img, label = img.view(-1,28*28).to(device), label.to(device)
+        
+        pred = model(img)
+        topv, topi = pred.topk(1, dim = 1)
+        n_correct = (topi.view(-1) == label).type(torch.int)
+        val_acc += n_correct.sum().item()
+    val_acc /= len(validation_loader.dataset)
+    val_acc_list.append(val_acc)
+    print(epoch, loss_epoch, val_acc)
 
 
-fig, ax = plt.subplots(1, 1, figsize = (30, 15))
-ax.plot(loss_list)
+fig, ax = plt.subplots(2, 1, figsize = (30, 15))
+ax[0].plot(loss_list)
+ax[1].plot(val_acc_list)
 
