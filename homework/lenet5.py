@@ -26,29 +26,43 @@ def get_dataloader(train_batch_size, val_batch_size):
     return train_loader, validation_loader
 
 
-class MNIST(nn.Module):
+class Lenet5(nn.Module):
     def __init__(self, p):
-        super(MNIST, self).__init__()
-        self.model = nn.Sequential(
-                nn.Dropout(p = p),
-                nn.Linear(28*28,128),
-                nn.ReLU(),
-                nn.Dropout(p = p),
-                nn.Linear(128,64),
-                nn.ReLU(),
-
-                nn.Linear(64,10),
+        super(Lenet5, self).__init__()
+        self.con = nn.Sequential(
+                nn.Conv2d(in_channels = 1,out_channels =6,
+                          kernel_size = (5,5), padding = 2),
+                nn.ReLU(True),
+                nn.AvgPool2d(kernel_size = (2,2),stride = 16)
+                
+                nn.Conv2d(in_channels = 6, out_channels = 16,
+                          kernel_size = (5,5))
+                nn.ReLU(True),
+                nn.AvgPool2d(kernel_size = (2,2),stride = 2)
+                nn.Conv2d(in_channels = 16, out_channels = 120, kernel_size = (5,5))
+                nn.ReLU()
+            )
+        self.fcl = nn.Sequential(
+                nn.Linear(120,84),
+                nn.ReLU(True),
+                
+                # nn.Dropout(p = p),
+                nn.Linear(84, 10)
                 nn.LogSoftmax(dim = 1)
+            
+            
             )
         
         
     def forward(self, x):
-        x = self.model(x)
-        return x
+        x1 = self.con(x)
+        x2 = self.fcl(x1)
+        return x2
+    
     
 
 epochs = 30
-trian_batch_size, val_batch_size = 10, 2000
+trian_batch_size, val_batch_size = 20, 1000
 lr = 0.001
 cnt = 0
 loss_list = []
@@ -65,7 +79,7 @@ for epoch in trange(epochs):
     model.train()
     loss_epoch = 0
     for step, (img, label) in enumerate(train_loader):
-        img, label = img.view(-1,28*28).to(device), label.to(device)
+        img, label = img.to(device), label.to(device)
         pred = model(img)
         optimizer.zero_grad()
         loss = criterion(pred,label)
@@ -78,7 +92,7 @@ for epoch in trange(epochs):
     val_acc = 0
     
     for step, (img, label) in enumerate(validation_loader):
-        img, label = img.view(-1,28*28).to(device), label.to(device)
+        img, label = img.to(device), label.to(device)
         
         pred = model(img)
         topv, topi = pred.topk(1, dim = 1)

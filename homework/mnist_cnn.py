@@ -29,26 +29,40 @@ def get_dataloader(train_batch_size, val_batch_size):
 class MNIST(nn.Module):
     def __init__(self, p):
         super(MNIST, self).__init__()
-        self.model = nn.Sequential(
-                nn.Dropout(p = p),
-                nn.Linear(28*28,128),
-                nn.ReLU(),
-                nn.Dropout(p = p),
-                nn.Linear(128,64),
-                nn.ReLU(),
+        self.con = nn.Sequential(
+                nn.Conv2d(1, 9, 3),
+                nn.ReLU(True),
+                
+                nn.Conv2d(9, 16, 3),
+                nn.ReLU(True),
+                nn.MaxPool2d(2,2),
 
-                nn.Linear(64,10),
+            )
+        self.fcl = nn.Sequential(
+                nn.Linear(12*12*16,128),
+                nn.ReLU(True),
+                
+                # nn.Dropout(p = p),
+                nn.Linear(128, 32),
+                nn.ReLU(True),
+                
+                # nn.Dropout(p = p),
+                nn.Linear(32,10),
                 nn.LogSoftmax(dim = 1)
+            
+            
             )
         
         
     def forward(self, x):
-        x = self.model(x)
-        return x
+        x1 = self.con(x)
+        x2 = self.fcl(x1.view(x.shape[0],-1))
+        return x2
+    
     
 
 epochs = 30
-trian_batch_size, val_batch_size = 10, 2000
+trian_batch_size, val_batch_size = 20, 1000
 lr = 0.001
 cnt = 0
 loss_list = []
@@ -65,7 +79,7 @@ for epoch in trange(epochs):
     model.train()
     loss_epoch = 0
     for step, (img, label) in enumerate(train_loader):
-        img, label = img.view(-1,28*28).to(device), label.to(device)
+        img, label = img.to(device), label.to(device)
         pred = model(img)
         optimizer.zero_grad()
         loss = criterion(pred,label)
@@ -78,7 +92,7 @@ for epoch in trange(epochs):
     val_acc = 0
     
     for step, (img, label) in enumerate(validation_loader):
-        img, label = img.view(-1,28*28).to(device), label.to(device)
+        img, label = img.to(device), label.to(device)
         
         pred = model(img)
         topv, topi = pred.topk(1, dim = 1)
