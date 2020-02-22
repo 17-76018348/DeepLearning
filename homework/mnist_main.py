@@ -65,7 +65,10 @@ for epoch in trange(epochs):
     model.train()
     loss_epoch = 0
     for step, (img, label) in enumerate(train_loader):
+        print(img.shape)
         img, label = img.view(-1,28*28).to(device), label.to(device)
+        print(img.shape)
+        break
         pred = model(img)
         optimizer.zero_grad()
         loss = criterion(pred,label)

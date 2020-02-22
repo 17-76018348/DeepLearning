@@ -30,24 +30,25 @@ class MNIST(nn.Module):
     def __init__(self, p):
         super(MNIST, self).__init__()
         self.con = nn.Sequential(
-                nn.Conv2d(1, 9, 3),
+                nn.Conv2d(1, 8, 3),
                 nn.ReLU(True),
                 
-                nn.Conv2d(9, 16, 3),
+                nn.Conv2d(8, 24, 3),
                 nn.ReLU(True),
                 nn.MaxPool2d(2,2),
 
             )
         self.fcl = nn.Sequential(
-                nn.Linear(12*12*16,128),
+                
+                nn.Linear(12*12*24,128),
                 nn.ReLU(True),
                 
                 # nn.Dropout(p = p),
-                nn.Linear(128, 32),
+                nn.Linear(128, 64),
                 nn.ReLU(True),
                 
                 # nn.Dropout(p = p),
-                nn.Linear(32,10),
+                nn.Linear(64,10),
                 nn.LogSoftmax(dim = 1)
             
             

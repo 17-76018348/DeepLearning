@@ -30,16 +30,18 @@ class Lenet5(nn.Module):
     def __init__(self, p):
         super(Lenet5, self).__init__()
         self.con = nn.Sequential(
+                
                 nn.Conv2d(in_channels = 1,out_channels =6,
                           kernel_size = (5,5), padding = 2),
+                
                 nn.ReLU(True),
-                nn.AvgPool2d(kernel_size = (2,2),stride = 16)
+                nn.AvgPool2d(kernel_size = (2,2),stride = 2),
                 
                 nn.Conv2d(in_channels = 6, out_channels = 16,
-                          kernel_size = (5,5))
+                          kernel_size = (5,5)),
                 nn.ReLU(True),
-                nn.AvgPool2d(kernel_size = (2,2),stride = 2)
-                nn.Conv2d(in_channels = 16, out_channels = 120, kernel_size = (5,5))
+                nn.AvgPool2d(kernel_size = (2,2),stride = 2),
+                nn.Conv2d(in_channels = 16, out_channels = 120, kernel_size = (5,5)),
                 nn.ReLU()
             )
         self.fcl = nn.Sequential(
@@ -47,7 +49,7 @@ class Lenet5(nn.Module):
                 nn.ReLU(True),
                 
                 # nn.Dropout(p = p),
-                nn.Linear(84, 10)
+                nn.Linear(84, 10),
                 nn.LogSoftmax(dim = 1)
             
             
@@ -56,6 +58,7 @@ class Lenet5(nn.Module):
         
     def forward(self, x):
         x1 = self.con(x)
+        x1 = x1.view(x.shape[0],-1)
         x2 = self.fcl(x1)
         return x2
     
@@ -69,7 +72,7 @@ loss_list = []
 val_acc_list = []
 train_loader, validation_loader = get_dataloader(trian_batch_size,val_batch_size)
 
-model = MNIST(p = 0.1).to(device)
+model = Lenet5(p = 0.1).to(device)
 criterion = nn.NLLLoss()
 optimizer = optim.Adam(model.parameters(),lr = lr)
 
