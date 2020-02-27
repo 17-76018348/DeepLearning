@@ -55,7 +55,7 @@ loss_list = []
 val_acc_list = []
 train_loader, validation_loader = get_dataloader(trian_batch_size,val_batch_size)
 
-model = MNIST(p = 0.1).to(device)
+model = MNIST(p = 0.3).to(device)
 criterion = nn.NLLLoss()
 optimizer = optim.Adam(model.parameters(),lr = lr)
 
@@ -65,17 +65,17 @@ for epoch in trange(epochs):
     model.train()
     loss_epoch = 0
     for step, (img, label) in enumerate(train_loader):
-        print(img.shape)
+
         img, label = img.view(-1,28*28).to(device), label.to(device)
-        print(img.shape)
-        break
+
         pred = model(img)
         optimizer.zero_grad()
         loss = criterion(pred,label)
+        loss_epoch += loss.item() * pred.shape[0]
         loss.backward()
         optimizer.step()
-    loss_epoch += loss.item() * pred.shape[0]
-    loss_list.append(loss)
+    loss_epoch /= len(train_loader.dataset)
+    loss_list.append(loss_epoch)
     
     model.eval()
     val_acc = 0

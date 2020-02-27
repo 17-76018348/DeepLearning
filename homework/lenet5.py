@@ -64,7 +64,7 @@ class Lenet5(nn.Module):
     
     
 
-epochs = 30
+epochs = 2
 trian_batch_size, val_batch_size = 20, 1000
 lr = 0.001
 cnt = 0
@@ -86,11 +86,11 @@ for epoch in trange(epochs):
         pred = model(img)
         optimizer.zero_grad()
         loss = criterion(pred,label)
+        loss_epoch += loss.item() * pred.shape[0]
         loss.backward()
         optimizer.step()
-    loss_epoch += loss.item() * pred.shape[0]
+    loss_epoch /= len(train_loader.dataset)
     loss_list.append(loss)
-    
     model.eval()
     val_acc = 0
     

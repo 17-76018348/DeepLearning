@@ -50,8 +50,6 @@ class MNIST(nn.Module):
                 # nn.Dropout(p = p),
                 nn.Linear(64,10),
                 nn.LogSoftmax(dim = 1)
-            
-            
             )
         
         
