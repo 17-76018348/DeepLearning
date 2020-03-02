@@ -82,6 +82,7 @@ class Gradient():
                 self.grad_mag = self.set_grad_mag()
                 self.grad_ang = self.set_grad_ang()
                 self.histogram.append(set_histogram(self.grad_mag,self.grad_ang))
+        self.histogram = np.array(self.histogram)
         return self.histogram
 
 
@@ -100,8 +101,8 @@ input = data_x[0]
 
 grad = Gradient(input = input, pad = padding, stride = stride)
 histogram  = grad.auto()
-print(len(histogram))
-print(len(histogram[0]))
+print(type(histogram))
+
 
 # grad_2 = Gradient2(input = input, pad = padding, stride = stride)
 # grad_mag_2, grad_ang_2 = grad_2.auto()
