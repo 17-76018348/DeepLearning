@@ -29,6 +29,38 @@ def set_histogram(mag, ang):
     hist[0] += hist[9]
     return hist[:9]
 
+def hist_normalize(histogram, bat_h,bat_w):
+    
+    hist_h, hist_w, ang_num = histogram.shape
+    ## 8,8,9
+    # histogram = list(histogram)
+    # output = np.zeros(shape = (hist_h - bat_h + 1,hist_w - bat_w + 1))
+    output = []
+    ## 7, 7
+    batch = np.zeros(shape = (bat_h,bat_w,ang_num))
+    batch_sum = np.zeros(shape = ())
+    
+    ## 2, 2
+    for h in range(hist_h - bat_h + 1):   # 7
+        for w in range(hist_w - bat_w + 1):   # 7
+            batch = histogram[h:h+bat_h,w:w+bat_w,:]
+            batch = batch.reshape((bat_h * bat_w,ang_num))
+            batch_sum = batch[0] + batch[1] + batch[2] + batch[3]
+            batch_sum = batch_sum / np.linalg.norm(batch_sum, axis = -1, ord = 2)
+            output.append(batch_sum)
+            output = np.array()
+    return output
+    
+def plot_hist(hist):
+    ## shape = [49][9] 
+    
+    # hist[0] 먼저 plot
+    
+    
+    
+
+
+    
 
 class Gradient():
     def __init__(self,input,pad,stride = 1,batch = (8,8),filter = "sobel"):
@@ -83,6 +115,7 @@ class Gradient():
                 self.grad_ang = self.set_grad_ang()
                 self.histogram.append(set_histogram(self.grad_mag,self.grad_ang))
         self.histogram = np.array(self.histogram)
+        self.histogram = self.histogram.reshape((int(self.in_y/self.bat_y), int(self.in_x/self.bat_x),9))
         return self.histogram
 
 
@@ -101,9 +134,9 @@ input = data_x[0]
 
 grad = Gradient(input = input, pad = padding, stride = stride)
 histogram  = grad.auto()
-print(type(histogram))
 
-
+print(histogram.shape)
+hist_normalized = hist_normalize(histogram,2,2)
 
 
 
