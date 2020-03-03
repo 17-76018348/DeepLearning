@@ -103,8 +103,8 @@ histogram  = grad.auto()
 print(len(histogram))
 print(len(histogram[0]))
 
-# grad_2 = Gradient2(input = input, pad = padding, stride = stride)
-# grad_mag_2, grad_ang_2 = grad_2.auto()
+
+
 
 
 
