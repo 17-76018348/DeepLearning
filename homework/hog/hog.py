@@ -48,19 +48,39 @@ def hist_normalize(histogram, bat_h,bat_w):
             batch_sum = batch[0] + batch[1] + batch[2] + batch[3]
             batch_sum = batch_sum / np.linalg.norm(batch_sum, axis = -1, ord = 2)
             output.append(batch_sum)
-            output = np.array()
+            
+    output = np.array(output)
     return output
-    
+
+
+
+
+
 def plot_hist(hist):
     ## shape = [49][9] 
-    
+    cell_num, angs  = hist.shape
     # hist[0] 먼저 plot
-    
-    
-    
 
+    cnt = 0
+    # shape = [9]
+    # plt.figure(figsize = (20,20))
+    fig, ax = plt.subplots(nrows = 7, ncols = 7, sharex = True, sharey = True, figsize = (10,10))
+    for h in range(7):
+        for w in range(7):
+            for idx, val in enumerate(hist[cnt]):
+                x = np.linspace(-2, 2,50)
 
-    
+                if val > 0.2:
+                    line = ax[h][w].plot(x, np.tan(idx * 20 * np.pi / 180) * x)
+                    
+                    plt.setp(line, color = 'r', linewidth = 2.0 * val )
+                    ax[h][w].axis('off')
+            plt.xlim(-2,2)
+            plt.ylim(-2,2)
+
+            cnt += 1
+    plt.show()
+        
 
 class Gradient():
     def __init__(self,input,pad,stride = 1,batch = (8,8),filter = "sobel"):
@@ -128,18 +148,19 @@ data_y = np.load('./Sign-language-digits-dataset/Y.npy')
 padding = 0
 stride = 1
 batch = (8,8)
-input = data_x[0]
+input = data_x[1]
 
+plt.imshow(input)
 
 
 grad = Gradient(input = input, pad = padding, stride = stride)
 histogram  = grad.auto()
 
-print(histogram.shape)
+
 hist_normalized = hist_normalize(histogram,2,2)
 
 
-
+plot_hist(hist_normalized)
 
 
 
@@ -151,10 +172,22 @@ hist_normalized = hist_normalize(histogram,2,2)
 
 
 
+#%%
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# x = np.arange(0, 2*np.pi,0.1)
+# y = np.tan(x)
 
         
 
+x = np.linspace(-2, 2, 10)
 
+# plt.plot(x, np.tan(1 * 20 * np.pi / 180) * x)
+plt.arrow(0.2,0.2,0.5,0.5)
+
+plt.show()
 
 
 
