@@ -70,7 +70,7 @@ def plot_hist(hist):
             for idx, val in enumerate(hist[cnt]):
                 x = np.linspace(-2, 2,50)
 
-                if val > 0.2:
+                if val > 0.4:
                     line = ax[h][w].plot(x, np.tan(idx * 20 * np.pi / 180) * x)
                     
                     plt.setp(line, color = 'r', linewidth = 2.0 * val )
