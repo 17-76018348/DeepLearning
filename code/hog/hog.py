@@ -80,28 +80,7 @@ def plot_hist(hist):
 
             cnt += 1
     plt.show()
-        
-def plot_arrow(hist):
-    x = np.linspace(-2, 2, 50)
-    
-    
-#%%
-    
-import matplotlib.pyplot as plt
 
-ax = plt.axes()
-ax.arrow(0, 0, 0.5, 0.5, head_width=0.05, head_length=0.1, fc='k', ec='k')
-plt.show()
-    
-    
-    
-    
-    
-
-
-
-
-#%%
 
 class Gradient():
     def __init__(self,input,pad,stride = 1,batch = (8,8),filter = "sobel"):
@@ -190,16 +169,6 @@ plot_hist(hist_normalized)
 # ax[1].imshow(grad_ang,'gray')
 # ax[2].imshow(grad_mag_2,'gray')
 # ax[3].imshow(grad_ang_2,'gray')
-
-
-
-#%%
-import numpy as np
-def plot_arrow():
-    x = np.linspace(-2, 2, 50)
-    plt.arrow()
-
-plot_arrow()
 
 
 

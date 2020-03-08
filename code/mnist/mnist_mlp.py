@@ -47,7 +47,7 @@ class MNIST(nn.Module):
         return x
     
 
-epochs = 30
+epochs = 1
 trian_batch_size, val_batch_size = 10, 2000
 lr = 0.001
 cnt = 0
@@ -67,7 +67,7 @@ for epoch in trange(epochs):
     for step, (img, label) in enumerate(train_loader):
 
         img, label = img.view(-1,28*28).to(device), label.to(device)
-
+        print(img.shape)
         pred = model(img)
         optimizer.zero_grad()
         loss = criterion(pred,label)
