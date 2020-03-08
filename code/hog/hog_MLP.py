@@ -2,6 +2,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import math
+from tqdm import trange
+
+
+
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+
+
+
+if torch.cuda.is_available():
+    device = torch.device('cuda')
+else:
+    device = torch.device('cpu')
+
 
 
 def zero_padding(pad_size, img):
@@ -69,8 +85,8 @@ def plot_hist(hist):
             for idx, val in enumerate(hist[cnt]):
                 x = np.linspace(-2, 2,50)
 
-                if val > 0.4:
-                    line = ax[h][w].plot(x, np.tan(idx * 20 * np.pi / 180) * x)
+                if val > 0.2:
+                    line = ax[h][w].plot(x, np.tan((idx * 20 + 90) * np.pi / 180) * x)
                     
                     plt.setp(line, color = 'r', linewidth = 2.0 * val )
                     ax[h][w].axis('off')
@@ -79,6 +95,7 @@ def plot_hist(hist):
 
             cnt += 1
     plt.show()
+    
         
 
     
@@ -147,7 +164,25 @@ class Gradient():
         self.histogram = self.histogram.reshape((int(self.in_y/self.bat_y), int(self.in_x/self.bat_x),9))
         return self.histogram
 
+class Hog_MLP(nn.Module):
+    def __init__(self, p):
+        super(Hog_MLP, self).__init__()
+        self.model = nn.Sequential(
+                nn.Dropout(p = p),
+                nn.Linear(49 * 7,128),
+                nn.ReLU(),
+                nn.Dropout(p = p),
+                nn.Linear(128,64),
+                nn.ReLU(),
 
+                nn.Linear(64,10),
+                nn.LogSoftmax(dim = 1)
+            )
+        
+        
+    def forward(self, x):
+        x = self.model(x)
+        return x
 
 
 
@@ -157,22 +192,77 @@ data_y = np.load('./Sign-language-digits-dataset/Y.npy')
 padding = 0
 stride = 1
 batch = (8,8)
-input = data_x[1]
-
-plt.imshow(input)
 
 
-grad = Gradient(input = input, pad = padding, stride = stride)
-histogram  = grad.auto()
-
-
-hist_normalized = hist_normalize(histogram,2,2)
-
-
-plot_hist(hist_normalized)
+img_num, h, w  = data_x.shape
+img_num, label = data_y.shape
 
 
 
 
+#%%
+hist_list = []
+
+for idx, img in enumerate(data_x):
+    input = img
+    grad = Gradient(input = input, pad = padding, stride = stride)
+    histogram  = grad.auto()
+    hist_normalized = hist_normalize(histogram,2,2)
+    hist_list.append(hist_normalized)
+    if idx % 100 == 0:
+        print(idx)
+
+#%%
+
+# plt.imshow(input)
+# plot_hist(hist_normalized)
+
+#%%
+
+# epochs = 1
+
+# lr = 0.001
+# cnt = 0
+# loss_list = []
+
+
+# model = Hog_MLP(p = 0.3).to(device)
+# criterion = nn.NLLLoss()
+# optimizer = optim.Adam(model.parameters(),lr = lr)
+
+# for epoch in trange(epochs):
+#         model.train()
+#         loss_epoch = 0
+#         for step, (img, label) in enumerate(train_loader):
+    
+#             img, label = img.view(-1,28*28).to(device), label.to(device)
+#             print(img.shape)
+#             pred = model(img)
+#             optimizer.zero_grad()
+#             loss = criterion(pred,label)
+#             loss_epoch += loss.item() * pred.shape[0]
+#             loss.backward()
+#             optimizer.step()
+#         loss_epoch /= len(train_loader.dataset)
+#         loss_list.append(loss_epoch)
+        
+#         model.eval()
+#         val_acc = 0
+        
+#         for step, (img, label) in enumerate(validation_loader):
+#             img, label = img.view(-1,28*28).to(device), label.to(device)
+            
+#             pred = model(img)
+#             topv, topi = pred.topk(1, dim = 1)
+#             n_correct = (topi.view(-1) == label).type(torch.int)
+#             val_acc += n_correct.sum().item()
+#         val_acc /= len(validation_loader.dataset)
+#         val_acc_list.append(val_acc)
+#         print(epoch, loss_epoch, val_acc)
+    
+    
+# fig, ax = plt.subplots(2, 1, figsize = (30, 15))
+# ax[0].plot(loss_list)
+# ax[1].plot(val_acc_list)
 
 
