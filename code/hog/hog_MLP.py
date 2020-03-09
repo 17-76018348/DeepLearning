@@ -169,7 +169,7 @@ class Hog_MLP(nn.Module):
         super(Hog_MLP, self).__init__()
         self.model = nn.Sequential(
                 nn.Dropout(p = p),
-                nn.Linear(49 * 7,128),
+                nn.Linear(49 * 9,128),
                 nn.ReLU(),
                 nn.Dropout(p = p),
                 nn.Linear(128,64),
@@ -211,6 +211,18 @@ for idx, img in enumerate(data_x):
     hist_list.append(hist_normalized)
     if idx % 100 == 0:
         print(idx)
+        
+ #%%
+hist_list = torch.tensor(hist_list, dtype = torch.float)
+
+
+data_y =  np.argmax(data_y, axis = 1)
+
+
+data_y = torch.tensor(data_y, dtype = torch.long).view(-1,1)
+
+
+
 
 #%%
 
@@ -219,50 +231,57 @@ for idx, img in enumerate(data_x):
 
 #%%
 
-# epochs = 1
+epochs = 30
 
-# lr = 0.001
-# cnt = 0
-# loss_list = []
+lr = 0.001
+cnt = 0
+loss_list = []
 
 
-# model = Hog_MLP(p = 0.3).to(device)
-# criterion = nn.NLLLoss()
-# optimizer = optim.Adam(model.parameters(),lr = lr)
+model = Hog_MLP(p = 0.3).to(device)
+criterion = nn.NLLLoss()
+optimizer = optim.Adam(model.parameters(),lr = lr)
 
-# for epoch in trange(epochs):
-#         model.train()
-#         loss_epoch = 0
-#         for step, (img, label) in enumerate(train_loader):
-    
-#             img, label = img.view(-1,28*28).to(device), label.to(device)
-#             print(img.shape)
-#             pred = model(img)
-#             optimizer.zero_grad()
-#             loss = criterion(pred,label)
-#             loss_epoch += loss.item() * pred.shape[0]
-#             loss.backward()
-#             optimizer.step()
-#         loss_epoch /= len(train_loader.dataset)
-#         loss_list.append(loss_epoch)
-        
-#         model.eval()
-#         val_acc = 0
-        
-#         for step, (img, label) in enumerate(validation_loader):
-#             img, label = img.view(-1,28*28).to(device), label.to(device)
+for epoch in trange(epochs):
+        model.train()
+        loss_epoch = 0
+        for step, hist in enumerate(hist_list):
+            hist = hist.view(-1,49 * 9).to(device)
+            label = data_y[step].to(device)
+            pred = model(hist)
+            optimizer.zero_grad()
+            # print("\n")
+            # print(pred.shape)
             
-#             pred = model(img)
-#             topv, topi = pred.topk(1, dim = 1)
-#             n_correct = (topi.view(-1) == label).type(torch.int)
-#             val_acc += n_correct.sum().item()
-#         val_acc /= len(validation_loader.dataset)
-#         val_acc_list.append(val_acc)
-#         print(epoch, loss_epoch, val_acc)
+            
+            
+            # print(label)
+            loss = criterion(pred,label)
+            loss_epoch += loss.item() * pred.shape[0]
+            loss.backward()
+            optimizer.step()
+        loss_epoch /= len(hist_list)
+        loss_list.append(loss_epoch)
+        
+        # model.eval()
+        # val_acc = 0
+        
+        # for step, (img, label) in enumerate(validation_loader):
+        #     img, label = img.view(-1,28*28).to(device), label.to(device)
+            
+        #     pred = model(img)
+        #     topv, topi = pred.topk(1, dim = 1)
+        #     n_correct = (topi.view(-1) == label).type(torch.int)
+        #     val_acc += n_correct.sum().item()
+        # val_acc /= len(validation_loader.dataset)
+        # val_acc_list.append(val_acc)
+        # print(epoch, loss_epoch, val_acc)
+        print(epoch, loss_epoch)
+        
     
     
-# fig, ax = plt.subplots(2, 1, figsize = (30, 15))
-# ax[0].plot(loss_list)
+fig, ax = plt.subplots(1, 1, figsize = (30, 15))
+ax.plot(loss_list)
 # ax[1].plot(val_acc_list)
 
 
