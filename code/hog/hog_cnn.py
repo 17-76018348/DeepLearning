@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 import math
 from tqdm import trange
-import random
+
 
 
 import torch
@@ -164,27 +164,41 @@ class Gradient():
         self.histogram = self.histogram.reshape((int(self.in_y/self.bat_y), int(self.in_x/self.bat_x),9))
         return self.histogram
 
-class Hog_MLP(nn.Module):
-    def __init__(self, p):
-        super(Hog_MLP, self).__init__()
-        self.model = nn.Sequential(
-                # nn.Dropout(p = p),
-                nn.Linear(49 * 9,256),
-                nn.ReLU(),
-                # nn.Dropout(p = p),
-                nn.Linear(256,64),
-                nn.ReLU(),
 
+
+
+class MNIST(nn.Module):
+    def __init__(self, p):
+        super(MNIST, self).__init__()
+        self.con = nn.Sequential(
+                nn.Conv2d(1, 8, 3),
+                nn.ReLU(True),
+                
+                nn.Conv2d(8, 24, 3),
+                nn.ReLU(True),
+                nn.MaxPool2d(2,2),
+
+            )
+        self.fcl = nn.Sequential(
+                
+                nn.Linear(12*12*24,128),
+                nn.ReLU(True),
+                
+                # nn.Dropout(p = p),
+                nn.Linear(128, 64),
+                nn.ReLU(True),
+                
+                # nn.Dropout(p = p),
                 nn.Linear(64,10),
                 nn.LogSoftmax(dim = 1)
             )
         
         
     def forward(self, x):
-        x = self.model(x)
-        return x
-
-
+        x1 = self.con(x)
+        x2 = self.fcl(x1.view(x.shape[0],-1))
+        return x2
+    
 
 
 data_x = np.load('./Sign-language-digits-dataset/X.npy')
@@ -194,25 +208,13 @@ stride = 1
 batch = (8,8)
 
 
-shuffle_idx = np.arange(data_x.shape[0])
-np.random.shuffle(shuffle_idx)
-
-data_x = data_x[shuffle_idx]
-data_y = data_y[shuffle_idx]
-
-
-
-# data_x, data_y = np.array(list(zip(*xy_data)))
-# data_x = data_x.reshape(-1,64,64)
-# data_y = data_y.reshape(-1,10)
-
 img_num, h, w  = data_x.shape
 img_num, label = data_y.shape
 
 
 
 
-#%%
+
 hist_list = []
 
 for idx, img in enumerate(data_x):
@@ -224,7 +226,7 @@ for idx, img in enumerate(data_x):
     if idx % 100 == 0:
         print(idx)
         
- #%%
+
 hist_list = torch.tensor(hist_list, dtype = torch.float)
 
 
@@ -233,70 +235,37 @@ data_y =  np.argmax(data_y, axis = 1)
 
 data_y = torch.tensor(data_y, dtype = torch.long).view(-1,1)
 
-
-
-
-#%%
-
-# plt.imshow(input)
-# plot_hist(hist_normalized)
-
-#%%
-
 epochs = 30
 
 lr = 0.001
 cnt = 0
 loss_list = []
-val_acc_list = []
+
 
 model = Hog_MLP(p = 0).to(device)
 criterion = nn.NLLLoss()
 optimizer = optim.Adam(model.parameters(),lr = lr)
 
-train_x = hist_list[ :1800,: ,: ] 
-test_x = hist_list[1800: ,: ,:]
-train_y = data_y[:1800,: ]
-test_y = data_y[1800: ,: ]
-
-
-
-
 
 for epoch in trange(epochs):
-        model.train()
-        loss_epoch = 0
-        for step, hist in enumerate(train_x):
-            hist = hist.view(-1,49 * 9).to(device)
-            label = train_y[step].to(device)
-            pred = model(hist)
-            optimizer.zero_grad()
-            loss = criterion(pred,label)
-            loss_epoch += loss.item() * pred.shape[0]
-            loss.backward()
-            optimizer.step()
-        loss_epoch /= len(train_x)
-        loss_list.append(loss_epoch)
-        
-        
-        model.eval()
-        val_acc = 0
-        
-        for step, hist in enumerate(test_x):
-            hist = hist.view(-1,49*9).to(device)
-            label = test_y[step].to(device)
-            
-            pred = model(hist)
-            topv, topi = pred.topk(1, dim = 1)
-            n_correct = (topi.view(-1) == label).type(torch.int)
-            val_acc += n_correct.sum().item()
-        val_acc /= len(test_x)
-        val_acc_list.append(val_acc)
-        
-#%%
-    
-fig, ax = plt.subplots(2, 1, figsize = (30, 15))
-ax[0].plot(loss_list)
-ax[1].plot(val_acc_list)
+    model.train()
+    loss_epoch = 0 
+    model.train()
+    loss_epoch = 0
+    for step, hist in enumerate(hist_list):
+        hist = hist.view(-1,49 * 9).to(device)
+        label = data_y[step].to(device)
+        pred = model(hist)
+        optimizer.zero_grad()
+        loss = criterion(pred,label)
+        loss_epoch += loss.item() * pred.shape[0]
+        loss.backward()
+        optimizer.step()
+    loss_epoch /= len(hist_list)
+    loss_list.append(loss_epoch)
+
+    print(epoch, loss_epoch)
 
 
+fig, ax = plt.subplots(1, 1, figsize = (30, 15))
+ax.plot(loss_list)

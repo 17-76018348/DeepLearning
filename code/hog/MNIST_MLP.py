@@ -71,10 +71,14 @@ for epoch in trange(epochs):
         
 
         img, label = img.view(-1,28*28).to(device), label.to(device)
-
+        
         pred = model(img)
 
         optimizer.zero_grad()
+        print("\n")
+        print(img.shape)
+        print(pred.shape)
+        print(label.shape)
         loss = criterion(pred,label)
 
         loss_epoch += loss.item() * pred.shape[0]
