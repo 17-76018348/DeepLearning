@@ -49,7 +49,7 @@ class MNIST_MLP(nn.Module):
     
     
 
-epochs = 3
+epochs = 10
 trian_batch_size, val_batch_size = 3, 2000
 lr = 0.001
 cnt = 0
@@ -75,11 +75,6 @@ for epoch in trange(epochs):
         pred = model(img)
 
         optimizer.zero_grad()
-        print("\n")
-
-        print(label)
-
-        sys.exit(0)
         loss = criterion(pred,label)
 
         loss_epoch += loss.item() * pred.shape[0]

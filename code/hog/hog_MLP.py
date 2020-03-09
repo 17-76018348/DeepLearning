@@ -163,31 +163,7 @@ class Gradient():
         self.histogram = np.array(self.histogram)
         self.histogram = self.histogram.reshape((int(self.in_y/self.bat_y), int(self.in_x/self.bat_x),9))
         return self.histogram
-
-class Hog_MLP(nn.Module):
-    def __init__(self, p):
-        super(Hog_MLP, self).__init__()
-        self.model = nn.Sequential(
-                nn.Dropout(p = p),
-                nn.Linear(49 * 9,128),
-                nn.ReLU(),
-                nn.Dropout(p = p),
-                nn.Linear(128,64),
-                nn.ReLU(),
-
-                nn.Linear(64,10),
-                nn.LogSoftmax(dim = 1)
-            )
-        
-        
-    def forward(self, x):
-        x = self.model(x)
-        return x
-
-
-
-
-data_x = np.load('./Sign-language-digits-dataset/X.npy')
+       nguage-digits-dataset/X.npy')
 data_y = np.load('./Sign-language-digits-dataset/Y.npy')
 padding = 0
 stride = 1
@@ -231,14 +207,14 @@ data_y = torch.tensor(data_y, dtype = torch.long).view(-1,1)
 
 #%%
 
-epochs = 30
+epochs = 90
 
 lr = 0.001
 cnt = 0
 loss_list = []
 
 
-model = Hog_MLP(p = 0.3).to(device)
+model = Hog_MLP(p = 0).to(device)
 criterion = nn.NLLLoss()
 optimizer = optim.Adam(model.parameters(),lr = lr)
 
@@ -250,32 +226,13 @@ for epoch in trange(epochs):
             label = data_y[step].to(device)
             pred = model(hist)
             optimizer.zero_grad()
-            # print("\n")
-            # print(pred.shape)
-            
-            
-            
-            # print(label)
             loss = criterion(pred,label)
             loss_epoch += loss.item() * pred.shape[0]
             loss.backward()
             optimizer.step()
         loss_epoch /= len(hist_list)
         loss_list.append(loss_epoch)
-        
-        # model.eval()
-        # val_acc = 0
-        
-        # for step, (img, label) in enumerate(validation_loader):
-        #     img, label = img.view(-1,28*28).to(device), label.to(device)
-            
-        #     pred = model(img)
-        #     topv, topi = pred.topk(1, dim = 1)
-        #     n_correct = (topi.view(-1) == label).type(torch.int)
-        #     val_acc += n_correct.sum().item()
-        # val_acc /= len(validation_loader.dataset)
-        # val_acc_list.append(val_acc)
-        # print(epoch, loss_epoch, val_acc)
+
         print(epoch, loss_epoch)
         
     
