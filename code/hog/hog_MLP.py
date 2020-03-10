@@ -208,7 +208,7 @@ data_y = data_y[shuffle_idx]
 
 img_num, h, w  = data_x.shape
 img_num, label = data_y.shape
-
+# pi
 
 
 
