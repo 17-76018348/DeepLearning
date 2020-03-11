@@ -152,39 +152,7 @@ class Gradient():
         self.grad_ang = self.set_grad_ang()
         return self.grad_mag, self.grad_ang
         
-class Hog_MLP(nn.Module):
-    def __init__(self, p):
-        super(Hog_MLP, self).__init__()
-        self.model = nn.Sequential(
-                # nn.Dropout(p = p),
-                nn.Linear(62 * 62,256),
-                nn.ReLU(),
-                # nn.Dropout(p = p),
-                nn.Linear(256,64),
-                nn.ReLU(),
 
-                nn.Linear(64,10),
-                nn.LogSoftmax(dim = -1)
-            )
-        # self.fc1 = nn.Linear(62 * 62,256)
-        # self.fc2 = nn.Linear(256, 64)
-        # self.fc3 = nn.Linear(64, 10)
-        # self.relu = nn.ReLU()
-        # self.logsoft = nn.LogSoftmax(dim = -1)
-        
-        
-        
-        
-    def forward(self, x):
-        # x1 = self.fc1(x)
-        # x2 = self.relu(x1)
-        # x3 = self.fc2(x2)
-        # x4 = self.relu(x3)
-        # x5 = self.fc3(x4)
-        # x6 = self.logsoft(x5)
-        
-        x = self.model(x)
-        return x
 #%%    
         
 
@@ -244,6 +212,39 @@ grad_ang_list = torch.tensor(grad_ang_list,dtype = torch.float).view(-1,62 * 62)
     
     
 #%%
+class Hog_MLP(nn.Module):
+    def __init__(self, p):
+        super(Hog_MLP, self).__init__()
+        # self.model = nn.Sequential(
+        #         # nn.Dropout(p = p),
+        #         nn.Linear(62 * 62,256),
+        #         nn.ReLU(),
+        #         # nn.Dropout(p = p),
+        #         nn.Linear(256,64),
+        #         nn.ReLU(),
+
+        #         nn.Linear(64,10),
+        #         nn.LogSoftmax(dim = -1)
+        #     )
+        self.fc1 = nn.Linear(62 * 62,256)
+        self.fc2 = nn.Linear(256, 64)
+        self.fc3 = nn.Linear(64, 10)
+        self.relu = nn.ReLU()
+        self.logsoft = nn.LogSoftmax(dim = -1)
+        
+        
+        
+        
+    def forward(self, x):
+        x1 = self.fc1(x)
+        x2 = self.relu(x1)
+        x3 = self.fc2(x2)
+        x4 = self.relu(x3)
+        x5 = self.fc3(x4)
+        x6 = self.logsoft(x5)
+        
+        # x = self.model(x)
+        return x6
 epochs = 30
 
 lr = 0.001
@@ -274,7 +275,7 @@ for epoch in trange(epochs):
             label = train_y[step].to(device)
             pred = model(img)
             optimizer.zero_grad()
-            # pred = pred.view(-1,10)
+            pred = pred.view(-1,10)
             loss = criterion(pred,label)
             loss_epoch += loss.item() * pred.shape[0]
             loss.backward()
