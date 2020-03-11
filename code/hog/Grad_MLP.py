@@ -18,8 +18,6 @@ if torch.cuda.is_available():
 else:
     device = torch.device('cpu')
 
-
-
 def zero_padding(pad_size, img):
     input_y = len(img)
     input_x = len(img[0])
@@ -96,20 +94,9 @@ def plot_hist(hist):
             cnt += 1
     plt.show()
     
-        
-
-    
-    
-    
-    
-    
-
-
-
-
 
 class Gradient():
-    def __init__(self,input,pad,stride = 1,batch = (8,8),filter = "sobel"):
+    def __init__(self,input,pad,stride = 1,filter = "sobel"):
         if filter == "sobel":
             self.filter_x = np.array([[-1,0,1],
                                       [-2,0,2],
@@ -121,25 +108,21 @@ class Gradient():
             )
             self.fil_size = 3
         self.pad = pad
-        self.batch = batch
-        self.bat_y = batch[0]
-        self.bat_x = batch[1]
         self.input = input
         self.stride = stride
         self.in_x = len(self.input[0])
         self.in_y = len(self.input)
-        self.grad_x = np.zeros(shape = (int(math.floor((self.bat_y + 2 * self.pad - self.fil_size)/self.stride) + 1),
-                                        int(math.floor((self.bat_x + 2 * self.pad - self.fil_size)/self.stride) + 1)
+        self.grad_x = np.zeros(shape = (int(math.floor((self.in_y + 2 * self.pad - self.fil_size)/self.stride) + 1),
+                                        int(math.floor((self.in_x + 2 * self.pad - self.fil_size)/self.stride) + 1)
             ))
         self.grad_y = np.zeros_like(self.grad_x)
-        self.histogram = []
         
         
 
     def set_grad(self,img):
 
-        for idx_h,h in enumerate(list(range(0, self.bat_y - self.fil_size + 2 * self.pad + 1, self.stride))):
-            for idx_w,w in enumerate(list(range(0, self.bat_x - self.fil_size + 2 * self.pad + 1, self.stride))):
+        for idx_h,h in enumerate(list(range(0, self.in_y - self.fil_size + 2 * self.pad + 1, self.stride))):
+            for idx_w,w in enumerate(list(range(0, self.in_x - self.fil_size + 2 * self.pad + 1, self.stride))):
 
                 self.grad_x[idx_h][idx_w] = np.sum(img[h:h+3,w:w+3] * self.filter_x)
                 self.grad_y[idx_h][idx_w] = np.sum(img[h:h+3,w:w+3] * self.filter_y) 
@@ -152,48 +135,61 @@ class Gradient():
         grad_ang = np.abs(np.arctan2(self.grad_y,self.grad_x+0.00000001))/np.pi*180
         return grad_ang
     def auto(self):
-        for y in range(int(self.in_y/self.bat_y)):
-            for x in range(int(self.in_x/self.bat_x)):
-                img = input[y * self.bat_y: (y+1) * self.bat_y,x * self.bat_x: (x+1) * self.bat_x]
-                # img = zero_padding(2,img)
-                self.set_grad(img)
-                self.grad_mag = self.set_grad_mag()
-                self.grad_ang = self.set_grad_ang()
-                self.histogram.append(set_histogram(self.grad_mag,self.grad_ang))
-        self.histogram = np.array(self.histogram)
-        self.histogram = self.histogram.reshape((int(self.in_y/self.bat_y), int(self.in_x/self.bat_x),9))
-        return self.histogram
-
+        # for y in range(int(self.in_y/self.bat_y)):
+        #     for x in range(int(self.in_x/self.bat_x)):
+        #         img = input[y * self.bat_y: (y+1) * self.bat_y,x * self.bat_x: (x+1) * self.bat_x]
+        #         # img = zero_padding(2,img)
+        #         self.set_grad(img)
+        #         self.grad_mag = self.set_grad_mag()
+        #         self.grad_ang = self.set_grad_ang()
+        #         self.histogram.append(set_histogram(self.grad_mag,self.grad_ang))
+        # self.histogram = np.array(self.histogram)
+        # self.histogram = self.histogram.reshape((int(self.in_y/self.bat_y), int(self.in_x/self.bat_x),9))
+        # return self.histogram
+        img = self.input
+        self.set_grad(img)
+        self.grad_mag = self.set_grad_mag()
+        self.grad_ang = self.set_grad_ang()
+        return self.grad_mag, self.grad_ang
+        
 class Hog_MLP(nn.Module):
     def __init__(self, p):
         super(Hog_MLP, self).__init__()
         self.model = nn.Sequential(
                 # nn.Dropout(p = p),
-                nn.Linear(49 * 9,256),
+                nn.Linear(62 * 62,256),
                 nn.ReLU(),
                 # nn.Dropout(p = p),
                 nn.Linear(256,64),
                 nn.ReLU(),
 
                 nn.Linear(64,10),
-                nn.LogSoftmax(dim = 1)
+                nn.LogSoftmax(dim = -1)
             )
+        # self.fc1 = nn.Linear(62 * 62,256)
+        # self.fc2 = nn.Linear(256, 64)
+        # self.fc3 = nn.Linear(64, 10)
+        # self.relu = nn.ReLU()
+        # self.logsoft = nn.LogSoftmax(dim = -1)
+        
+        
         
         
     def forward(self, x):
+        # x1 = self.fc1(x)
+        # x2 = self.relu(x1)
+        # x3 = self.fc2(x2)
+        # x4 = self.relu(x3)
+        # x5 = self.fc3(x4)
+        # x6 = self.logsoft(x5)
+        
         x = self.model(x)
         return x
-
-
-
+#%%    
+        
 
 data_x = np.load('./Sign-language-digits-dataset/X.npy')
 data_y = np.load('./Sign-language-digits-dataset/Y.npy')
-padding = 0
-stride = 1
-batch = (8,8)
-
-
 shuffle_idx = np.arange(data_x.shape[0])
 np.random.shuffle(shuffle_idx)
 
@@ -202,47 +198,52 @@ data_y = data_y[shuffle_idx]
 
 
 
-# data_x, data_y = np.array(list(zip(*xy_data)))
-# data_x = data_x.reshape(-1,64,64)
-# data_y = data_y.reshape(-1,10)
-
-img_num, h, w  = data_x.shape
-img_num, label = data_y.shape
-# pi
-
-
-
-#%%
-hist_list = []
-
-for idx, img in enumerate(data_x):
-    input = img
-    grad = Gradient(input = input, pad = padding, stride = stride)
-    histogram  = grad.auto()
-    hist_normalized = hist_normalize(histogram,2,2)
-    hist_list.append(hist_normalized)
-    if idx % 100 == 0:
-        print(idx)
-        
- #%%
-hist_list = torch.tensor(hist_list, dtype = torch.float)
-
-
 data_y =  np.argmax(data_y, axis = 1)
-
-
 data_y = torch.tensor(data_y, dtype = torch.long).view(-1,1)
 
+print("1",data_y.shape)
+# grad_mag_list = []
+# grad_ang_list = []
 
-
+grad_mag_list = np.zeros(shape = (2062,62,62))
+grad_ang_list = np.zeros(shape = (2062,62,62))
 
 #%%
 
-# plt.imshow(input)
-# plot_hist(hist_normalized)
+
+
+padding = 0
+stride = 1
+batch = (8,8)
+for idx,img in enumerate(data_x):
+    grad = Gradient(input = img, pad = padding, stride = stride)
+    grad_mag, grad_ang = grad.auto()
+    grad_mag_list[idx] = grad_mag
+    grad_ang_list[idx] = grad_ang
+    if idx % 100 == 0:
+        print(idx)
+
 
 #%%
+        
+grad_mag_list = torch.tensor(grad_mag_list,dtype = torch.float).view(-1,62 * 62)
+grad_ang_list = torch.tensor(grad_ang_list,dtype = torch.float).view(-1,62 * 62)
 
+
+    
+
+
+
+
+# fig, ax = plt.subplots(2,1,figsize = (20,20))
+
+# ax[0].imshow(grad_mag,'gray')
+# ax[1].imshow(grad_ang,'gray') 
+    
+    
+    
+    
+#%%
 epochs = 30
 
 lr = 0.001
@@ -254,8 +255,8 @@ model = Hog_MLP(p = 0).to(device)
 criterion = nn.NLLLoss()
 optimizer = optim.Adam(model.parameters(),lr = lr)
 
-train_x = hist_list[ :1800,: ,: ] 
-test_x = hist_list[1800: ,: ,:]
+train_x = grad_mag_list[ :1800] 
+test_x = grad_mag_list[1800: ]
 train_y = data_y[:1800,: ]
 test_y = data_y[1800: ,: ]
 
@@ -266,17 +267,14 @@ test_y = data_y[1800: ,: ]
 for epoch in trange(epochs):
         model.train()
         loss_epoch = 0
-        for step, hist in enumerate(train_x):
+        for step, img in enumerate(train_x):
             print(train_x.shape)
-            print(hist.shape)
-            hist = hist.view(-1,49 * 9).to(device)
+            print(img.shape)
+            img = img.to(device)
             label = train_y[step].to(device)
-            pred = model(hist)
+            pred = model(img)
             optimizer.zero_grad()
-            # print(pred.shape)
-            # 1 10
-            # print(label.shape)
-            # 1
+            # pred = pred.view(-1,10)
             loss = criterion(pred,label)
             loss_epoch += loss.item() * pred.shape[0]
             loss.backward()
@@ -288,11 +286,12 @@ for epoch in trange(epochs):
         model.eval()
         val_acc = 0
         
-        for step, hist in enumerate(test_x):
-            hist = hist.view(-1,49*9).to(device)
+        for step, img in enumerate(test_x):
+            img = img.to(device)
             label = test_y[step].to(device)
             
-            pred = model(hist)
+            pred = model(img)
+            pred = pred.view(-1,10)
             topv, topi = pred.topk(1, dim = 1)
             n_correct = (topi.view(-1) == label).type(torch.int)
             val_acc += n_correct.sum().item()
