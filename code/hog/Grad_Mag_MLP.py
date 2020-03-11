@@ -203,10 +203,10 @@ grad_ang_list = torch.tensor(grad_ang_list,dtype = torch.float).view(-1,62 * 62)
 
 
 
-# fig, ax = plt.subplots(2,1,figsize = (20,20))
+fig, ax = plt.subplots(2,1,figsize = (20,20))
 
-# ax[0].imshow(grad_mag,'gray')
-# ax[1].imshow(grad_ang,'gray') 
+ax[0].imshow(grad_mag,'gray')
+ax[1].imshow(grad_ang,'gray') 
     
     
     
