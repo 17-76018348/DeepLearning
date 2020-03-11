@@ -267,10 +267,12 @@ for epoch in trange(epochs):
         model.train()
         loss_epoch = 0
         for step, hist in enumerate(train_x):
-            print(train_x.shape)
+            # print(train_x.shape)
+            # print(hist.shape)
             print(hist.shape)
             hist = hist.view(-1,49 * 9).to(device)
             label = train_y[step].to(device)
+            print(hist.shape)
             pred = model(hist)
             optimizer.zero_grad()
             # print(pred.shape)
