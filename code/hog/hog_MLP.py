@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 import math
 from tqdm import trange
-import random
+
 
 
 import torch
@@ -187,8 +187,8 @@ class Hog_MLP(nn.Module):
 
 
 
-data_x = np.load('./Sign-language-digits-dataset/X.npy')
-data_y = np.load('./Sign-language-digits-dataset/Y.npy')
+data_x = np.load('/home/nvidia/yang/DeepLearning/code/hog/Sign-language-digits-dataset/X.npy')
+data_y = np.load('/home/nvidia/yang/DeepLearning/code/hog/Sign-language-digits-dataset/Y.npy')
 padding = 0
 stride = 1
 batch = (8,8)
@@ -232,7 +232,7 @@ data_y = torch.tensor(data_y, dtype = torch.long).view(-1,1)
 
 #%%
 
-epochs = 30
+epochs = 100
 
 lr = 0.001
 cnt = 0

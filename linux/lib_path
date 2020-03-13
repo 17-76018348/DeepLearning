@@ -1,5 +1,6 @@
 current torch 등등 여러가지 정상적으로 구동하는 라이브러리 설치되는 경로
 /home/nvidia/.local/lib/ptyhon3.6/site-packages
 
-
+잘못깔리는 위치
+/usr/local/lib/python3.6/dist-packages
 
