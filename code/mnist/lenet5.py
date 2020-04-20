@@ -110,3 +110,22 @@ fig, ax = plt.subplots(2, 1, figsize = (30, 15))
 ax[0].plot(loss_list)
 ax[1].plot(val_acc_list)
 
+
+#%%
+input_dim = (28,28,1)
+discriminator_conv_filters = [64,64,128,128]
+discriminator_conv_kernal_size = [5,5,5,5]
+discriminator_conv_strides = [2,2,2,1]
+discriminator_batch_norm_momentum = None
+discriminator_activation = 'relu'
+discriminator_dropout_rate = 0.4
+discriminator_learning_rate = 0.0008
+generator_initial_dense_layer_size = (7, 7, 64) 
+generator_upsample = [2,2, 1, 1]
+generator_conv_filters = [128,64,64,1]
+generator_conv_kernel_size = [5,5,5,5] 
+generator_conv_strides = [1,1, 1, 1] 
+generator_batch_norm_momentum = 0.9
+generator_activation = 'relu'
+generator_dropout_rate = None
+generator_learning_rate = 0.0004 
