@@ -67,12 +67,13 @@ class Gan(nn.Module):
                     nn.Linear(2048,1),
                     nn.Sigmoid()
         )
-        self.fcl_generator = nn.Sequential(
+        self.fcl_generator_1D = nn.Sequential(
                     nn.Linear(100,3136),
-                    
-
-            
-
+                    nn.BatchNorm1d(num_featres = 3136),
+                    nn.ReLU(True)
+        )
+        self.fcl_generator_2D = nn.Sequential(
+                    nn.ConvTranspose2d
         )
 #%%
 
