@@ -107,32 +107,13 @@ class Gradient():
 
     def set_grad(self,img):
 
-        for idx_h,h in enumerate(list(range(0, self.bat_y - self.fil_size + 2 * self.pad + 1, self.stride))):
+        for idx_h,h in enumerate(list(range(0, self.in_y - self.fil_size + 2 * self.pad + 1, self.stride))):
             for idx_w,w in enumerate(list(range(0, self.bat_x - self.fil_size + 2 * self.pad + 1, self.stride))):
 
                 self.grad_x[idx_h][idx_w] = np.sum(img[h:h+3,w:w+3] * self.filter_x)
                 self.grad_y[idx_h][idx_w] = np.sum(img[h:h+3,w:w+3] * self.filter_y) 
-        return self.grad_x,self.grad_y
-    def set_grad_mag(self):
-        grad_mag = np.power((np.power(self.grad_x,2) + np.power(self.grad_y,2)),1/2)
-        return grad_mag
-        
-    def set_grad_ang(self):
-        grad_ang = np.abs(np.arctan2(self.grad_y,self.grad_x+0.00000001))/np.pi*180
-        return grad_ang
-    def auto(self):
-        for y in range(int(self.in_y/self.bat_y)):
-            for x in range(int(self.in_x/self.bat_x)):
-                img = input[y * self.bat_y: (y+1) * self.bat_y,x * self.bat_x: (x+1) * self.bat_x]
-                self.set_grad(img)
 
-                self.grad_mag = self.set_grad_mag()
-               
-                self.grad_ang = self.set_grad_ang()
-                self.histogram.append(set_histogram(self.grad_mag,self.grad_ang))
-        self.histogram = np.array(self.histogram)
-        self.histogram = self.histogram.reshape((int(self.in_y/self.bat_y), int(self.in_x/self.bat_x),9))
-        return self.histogram
+    
 
 
 
@@ -150,7 +131,9 @@ input = data_x[1]
 
 
 grad = Gradient(input = input, pad = padding, stride = stride)
-histogram  = grad.auto()
+grad.set_grad(input)
+plt.imshow(grad.grad_x)
+
 
 
 # hist_normalized = hist_normalize(histogram,2,2)
