@@ -78,3 +78,4 @@ class Gan(nn.Module):
 #%%
 
 
+
