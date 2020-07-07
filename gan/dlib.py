@@ -73,7 +73,7 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
     img = dlib.load_rgb_image(f)
 
     win.clear_overlay()
-    win.set_image(img)
+    win.set_image(img)  
 
     # Ask the detector to find the bounding boxes of each face. The 1 in the
     # second argument indicates that we should upsample the image 1 time. This
