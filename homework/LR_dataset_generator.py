@@ -35,19 +35,7 @@ class LR_dataset_generator:
         y_data += self._coefficient_list[0]
         
         return x_data, y_data
-    # def make_dataset(self):
-    #     y_data = np.zeros(shape = (self._n_sample, 1))
-    #     x_data = np.zeros(shape = (self._n_sample, 1))
-        
-    #     for feature_idx in range(1, self._feature_dim + 1):
-    #         feature_data = np.random.normal(loc = self._distribution_params[feature_idx]['mean'],
-    #                                         scale =self._distribution_params[feature_idx]['std'],
-    #                                         size = (self._n_sample, 1)
-    #                                         )
-    #         x_data = np.hstack((x_data, feature_data))
-    #         y_data += self._coefficient_list[feature_idx] * feature_data
-    #     y_data += self._coefficient_list[0]
-    #     return x_data, y_data
+
     def set_n_sample(self, n_sample):
         self._n_sample = n_sample
     
