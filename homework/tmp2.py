@@ -48,10 +48,8 @@ node1 = [None] + [nodes.mul_node() for _ in range(feature_dim)]
 node2 = [None] + [nodes.plus_node() for _ in range(feature_dim)]
 node3 = nodes.minus_node()
 node4 = nodes.square_node()
-
-
 node5 = nodes.mean_node()
-##### End Your Code(Loss Implementation) #####
+
 
 #%%
 th3, th2, th1, th0 = 0.1, 0.1, 0.1, 0.1
@@ -61,7 +59,7 @@ n_batch = int(np.ceil(dataset.shape[0]/batch_size))
 
 batch = get_data_batch(dataset, batch_idx,batch_size, n_batch)
 print("batch.shape : ", batch.shape)
-X, Y = batch[:,1:-1], batch[:,-1]
+X, Y = batch[:,:-1], batch[:,-1]
 print("X.shape : ", X.shape)
 print("Y.shape : ", Y.shape, '\n')
 #%%
@@ -70,7 +68,7 @@ print("Y.shape : ", Y.shape, '\n')
 lr = 0.01
 epochs = 20
 
-batch_size = 12
+batch_size = 8
 ##### End Your Code(Learning Preparation) #####
 Th_list = [0.1, 0.1, 0.1, 0.1]
 th_accum = np.array(Th_list).reshape(-1, 1)
