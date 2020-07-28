@@ -33,7 +33,7 @@ Th = np.ones(shape = (feature_dim + 1,), dtype = np.float).reshape(-1, 1)
 affine = affine_MSE.Affine_Function(feature_dim, Th)
 cost = affine_MSE.MSE_Cost()
 
-epochs, lr = 300, 0.01
+epochs, lr = 10000, 0.01
 th_accum = Th.reshape(-1, 1)
 cost_list = []
 
