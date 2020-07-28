@@ -1,38 +1,26 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-import basic_nodes as nodes
-import os
-import sys
-utils_path = os.path.dirname(os.path.abspath(__name__)) + '/../utils/'
-if utils_path not in sys.path:    
-    sys.path.append(utils_path)
-
-
-from LR_dataset_generator import LR_dataset_generator
-    
-plt.style.use('seaborn')
-np.random.seed(0)
-
-def get_data_batch(dataset, batch_idx, batch_size, n_batch):
-    if batch_idx is n_batch -1:
-        batch = dataset[batch_idx*batch_size:]
-    else:
-        batch = dataset[batch_idx*batch_size : (batch_idx+1)*batch_size]
-    return batch
 
 #%%
-np.random.seed(0)
 
-##### Start Your Code(Dataset Setting) #####
-coefficient_list = [3, 3]
-distribution_params = {1:{'mean':0, 'std':1}}
-##### End Your Code(Dataset Setting) #####
+##### Start Your Code(Data Sample Preparation) #####
+x2 = 1
+x1 = 1
+y = 4
+##### Start Your Code(Data Sample Preparation) #####
+th2_range = np.linspace(-3, 5, 100)
+th1_range = np.linspace(-3, 3, 100)
+th0_range = np.linspace(-3, 3, 100)
+
+Th2, Th1 = np.meshgrid(th2_range, th1_range)
+
+##### Start Your Code(Loss Function) #####
+loss = np.power(y - (Th2*x2 + Th1*x1 + 5), 2)
+##### End Your Code(Loss Function) #####
 
 
-##### Start Your Code(Dataset Generation) #####
-data_gen = LR_dataset_generator(feature_dim = 1)
-data_gen.set_coefficient(coefficient_list)
-data_gen.set_distribution_params(distribution_params)
-x_data, y_data = data_gen.make_dataset()
-##### End Your Code(Dataset Generation) #####
+fig, ax = plt.subplots(figsize = (7,7))
+levels = np.geomspace(np.min(loss) + 0.01, np.max(loss), 30)
+cmap = cm.get_cmap('Reds_r', lut = len(levels))
+ax.contour(Th2, Th1, loss, levels = levels, cmap = cmap)
