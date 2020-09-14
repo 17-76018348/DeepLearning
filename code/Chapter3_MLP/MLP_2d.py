@@ -20,7 +20,7 @@ else:
     device = torch.device('cpu')
 
 x_train_data, y_train_data, x_test_data, y_test_data = dataset_generator()
-
+#%%
 # fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (30,15))
 # cmap = cm.get_cmap('bwr_r', 2)
 # ax1.grid()
